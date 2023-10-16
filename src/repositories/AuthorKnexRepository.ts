@@ -1,91 +1,97 @@
-import database from '../database';
+import { AuthorRepository } from "@/types/repositories";
+import database from "../database";
+import { Author } from "@/types";
 
 export default class AuthorKnexRepository implements AuthorRepository {
   public async get(id: number): Promise<Author> {
-    return database.select()
-      .from('author')
-      .where('id', id)
-      .first();
+    return database.select().from("author").where("id", id).first();
   }
 
   public async getMany(ids: number[]): Promise<Author[]> {
-    return database.select()
-      .from('author')
-      .whereIn('id', ids);
+    return database.select().from("author").whereIn("id", ids);
   }
 
-  public async find(params: AuthorRepository.FindParameters): Promise<Author[]> {
+  public async find(params): Promise<Author[]> {
     const { first, after, firstName, lastName, orderBy } = params;
 
-    return database.select()
-      .from('author')
+    return database
+      .select()
+      .from("author")
       .modify((queryBuilder) => {
-        if (typeof after !== 'undefined' && after !== null) {
+        if (typeof after !== "undefined" && after !== null) {
           queryBuilder.offset(after);
         }
 
-        if (typeof firstName !== 'undefined' && firstName !== null) {
-          queryBuilder.where('firstName', 'like', `%${firstName}%`);
+        if (typeof firstName !== "undefined" && firstName !== null) {
+          queryBuilder.where("firstName", "like", `%${firstName}%`);
         }
 
-        if (typeof lastName !== 'undefined' && lastName !== null) {
-          queryBuilder.where('lastName', 'like', `%${lastName}%`);
+        if (typeof lastName !== "undefined" && lastName !== null) {
+          queryBuilder.where("lastName", "like", `%${lastName}%`);
         }
 
         if (Array.isArray(orderBy)) {
-          orderBy.forEach(ob => queryBuilder.orderBy(ob.field, ob.direction));
+          orderBy.forEach((ob) => queryBuilder.orderBy(ob.field, ob.direction));
         }
       })
       .limit(first);
   }
 
-  public async count(params: AuthorRepository.CountParameters): Promise<number> {
+  public async count(params): Promise<number> {
     const { firstName, lastName } = params;
 
-    return database.count({ count: '*' })
-      .from('author')
+    return database
+      .count({ count: "*" })
+      .from("author")
       .modify((queryBuilder) => {
-        if (typeof firstName !== 'undefined' && firstName !== null) {
-          queryBuilder.where('firstName', 'like', `%${firstName}%`);
+        if (typeof firstName !== "undefined" && firstName !== null) {
+          queryBuilder.where("firstName", "like", `%${firstName}%`);
         }
 
-        if (typeof lastName !== 'undefined' && lastName !== null) {
-          queryBuilder.where('lastName', 'like', `%${lastName}%`);
+        if (typeof lastName !== "undefined" && lastName !== null) {
+          queryBuilder.where("lastName", "like", `%${lastName}%`);
         }
       })
       .first()
-      .then(result => result.count);
+      .then((result) => result.count);
   }
 
-  public async create(params: AuthorRepository.CreateParameters): Promise<Author> {
-    return database.insert({
-      firstName: params.firstName,
-      lastName: params.lastName,
-    })
-    .into('author')
-    .then(ids => {
-      return this.get(ids[0]);
-    });
+  public async create(params): Promise<Author> {
+    return database
+      .insert({
+        firstName: params.firstName,
+        lastName: params.lastName,
+      })
+      .into("author")
+      .then((ids) => {
+        return this.get(ids[0]);
+      });
   }
 
-  public async update(id: number, firstName: string, lastName: string): Promise<Author> {
-    return database.table('author')
-      .where('id', id)
+  public async update(
+    id: number,
+    firstName: string,
+    lastName: string
+  ): Promise<Author> {
+    return database
+      .table("author")
+      .where("id", id)
       .modify((queryBuilder) => {
-        if (typeof firstName !== 'undefined' && firstName !== null) {
-          queryBuilder.update('firstName', firstName);
+        if (typeof firstName !== "undefined" && firstName !== null) {
+          queryBuilder.update("firstName", firstName);
         }
 
-        if (typeof lastName !== 'undefined' && lastName !== null) {
-          queryBuilder.update('lastName', lastName);
+        if (typeof lastName !== "undefined" && lastName !== null) {
+          queryBuilder.update("lastName", lastName);
         }
       })
-      .then(updatedRows => {
+      .then((updatedRows) => {
         if (updatedRows.length === 0) {
-          throw new Error('Author not found!');
+          throw new Error("Author not found!");
         }
         return updatedRows;
-      }).then(() => {
+      })
+      .then(() => {
         return this.get(id);
       });
   }
@@ -93,7 +99,7 @@ export default class AuthorKnexRepository implements AuthorRepository {
   public async delete(id: number): Promise<Author> {
     const author = await this.get(id);
 
-    await database.table('author').where('id', id).del();
+    await database.table("author").where("id", id).del();
 
     return author;
   }

@@ -8,14 +8,11 @@
     "resolveJsonModule": true,
     "sourceMap": false,
     "outDir": "dist",
-    "baseUrl": "src"
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "baseUrl": "src",
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

@@ -1,8 +1,11 @@
-import DataLoader from 'dataloader';
+import QuoteKnexRepository from "@/repositories/QuoteKnexRepository";
+import { Author } from "@/types";
+import { AuthorRepository } from "@/types/repositories";
+import DataLoader from "dataloader";
 
 interface RepositoriesContext {
   author: AuthorRepository;
-  quote: QuoteRepository;
+  quote: QuoteKnexRepository;
 }
 
 interface LoadersContext {

@@ -1,0 +1,8 @@
+{
+    "watch": ["src"],
+    "ignore": ["src/**/*.test.ts"],
+    "ext": "ts,mjs,js,json,graphql",
+    "legacyWatch": true,
+    "exec": "node -r tsconfig-paths/register -r ts-node/register ./src/index.ts"
+  }
+  

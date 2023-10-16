@@ -1,5 +1,6 @@
-import DataLoader from 'dataloader';
-import AuthorRepository from '../repositories/AuthorKnexRepository';
+import DataLoader from "dataloader";
+import AuthorRepository from "../repositories/AuthorKnexRepository";
+import { Author } from "@/types";
 
 async function getAuthorsById(ids: number[]): Promise<Author[]> {
   const authorRepository = new AuthorRepository();

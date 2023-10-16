@@ -4,40 +4,42 @@ import {
   GraphQLObjectType,
   GraphQLString,
   GraphQLInt,
-} from 'graphql';
-import Context from '../../context/Context';
-import { formatDate } from '../../utils/functions';
-import quoteConnection from './connections/quoteConnection';
-import nodesToEdges from '../queries/nodesToEdges';
-import toConnection from '../queries/toConnection';
+} from "graphql";
+import Context from "../../context/Context";
+import { formatDate } from "../../utils/functions";
+import quoteConnection from "./connections/quoteConnection";
+import nodesToEdges from "../queries/nodesToEdges";
+import toConnection from "../queries/toConnection";
+
+type Author = any;
 
 const author = new GraphQLObjectType({
-  name: 'Author',
+  name: "Author",
   fields: () => ({
     id: {
       type: new GraphQLNonNull(GraphQLID),
-      description: 'Globally unique ID of the author',
+      description: "Globally unique ID of the author",
       resolve: (obj: Author): string => {
-        return Buffer.from(`author-${obj.id}`).toString('base64');
+        return Buffer.from(`author-${obj.id}`).toString("base64");
       },
     },
     _id: {
       type: new GraphQLNonNull(GraphQLID),
-      description: 'Database ID of the author',
+      description: "Database ID of the author",
       resolve: (obj: Author): number => {
         return obj.id;
       },
     },
     firstName: {
       type: new GraphQLNonNull(GraphQLString),
-      description: 'Author\'s first name',
+      description: "Author's first name",
       resolve: (obj: Author): string => {
         return obj.firstName;
       },
     },
     lastName: {
       type: new GraphQLNonNull(GraphQLString),
-      description: 'Author\'s last name',
+      description: "Author's last name",
       resolve: (obj: Author): string => {
         return obj.lastName;
       },
@@ -47,12 +49,14 @@ const author = new GraphQLObjectType({
       args: {
         first: {
           defaultValue: 10,
-          description: 'Limits the number of results returned in the page. Defaults to 10.',
+          description:
+            "Limits the number of results returned in the page. Defaults to 10.",
           type: GraphQLInt,
         },
         after: {
-          defaultValue: 'Y3Vyc29yMA==', // base64encode('cursor0')
-          description: 'The cursor value of an item returned in previous page. An alternative to in integer offset.',
+          defaultValue: "Y3Vyc29yMA==", // base64encode('cursor0')
+          description:
+            "The cursor value of an item returned in previous page. An alternative to in integer offset.",
           type: GraphQLString,
         },
         query: {
@@ -60,7 +64,15 @@ const author = new GraphQLObjectType({
         },
       },
       resolve: async (obj: Author, args, context: Context): Promise<any> => {
-        const after = typeof args.after === 'undefined' || args.after === null ? 0 : parseInt(Buffer.from(args.after, 'base64').toString('ascii').replace('cursor', ''), 10);
+        const after =
+          typeof args.after === "undefined" || args.after === null
+            ? 0
+            : parseInt(
+                Buffer.from(args.after, "base64")
+                  .toString("ascii")
+                  .replace("cursor", ""),
+                10
+              );
         const quotes = await context.repositories.quote.find({
           first: args.first,
           after,
@@ -72,12 +84,17 @@ const author = new GraphQLObjectType({
           query: args.query,
         });
         const edges = nodesToEdges(quotes, after);
-        return toConnection(edges, quotesCount, edges.length === args.first, after > 0);
-      }
+        return toConnection(
+          edges,
+          quotesCount,
+          edges.length === args.first,
+          after > 0
+        );
+      },
     },
     createdAt: {
       type: new GraphQLNonNull(GraphQLString),
-      description: '',
+      description: "",
       resolve: (obj: Author): string => {
         return formatDate(new Date(obj.createdAt));
       },

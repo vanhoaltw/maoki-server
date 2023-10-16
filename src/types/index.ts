@@ -1,18 +1,18 @@
-type Author = {
+export type Author = {
   id: number;
   firstName: string;
   lastName: string;
   createdAt: string;
 }
 
-type Quote = {
+export type Quote = {
   id: number;
   authorId: number;
   text: string;
   createdAt: string;
 }
 
-type OrderBy = {
+export type OrderBy = {
   field: string;
   direction: string;
 }
