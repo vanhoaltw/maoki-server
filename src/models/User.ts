@@ -6,24 +6,36 @@ import bcrypt from "bcrypt";
 
 import jwt from "jsonwebtoken";
 import moment from "moment";
-import config from "@/config";
+import config from "@/configs/config";
 
 class User extends BaseModel {
   firstName?: string;
   lastName: string;
   username: string;
   email: string;
-  passwordHash: string;
+  identityVerificationTypes?: string[];
+  birthday?: Date;
+  passwordHash?: string;
   bio?: string;
+  titleText?: string;
   gender?: string;
   avatar?: string;
-  address?: string;
+  favoriteSong?: string;
+  work?: string;
+  school?: string;
+  location?: string;
+  managedListingsTotalCount?: number;
+  guestType?: string;
   isAvailable?: boolean;
+  isSuperhost?: boolean;
   completeOnboarding?: boolean;
   lastActivedAt?: string;
   registeredAt?: Date;
 
   provider?: SocialConnect;
+
+  sids?: number[];
+  sid?: number;
 
   static tableName = "user";
 
@@ -35,6 +47,10 @@ class User extends BaseModel {
         id: { type: "integer" },
         firstName: { type: "string" },
         lastName: { type: "string" },
+        identityVerificationTypes: {
+          type: "array",
+          items: { type: "string" },
+        },
         username: { type: "string" },
         email: { type: "string" },
         bio: { type: "string" },
@@ -69,11 +85,10 @@ class User extends BaseModel {
     return bcrypt.compareSync(input, password);
   }
 
-  static toJsonWebToken(id: number, email: string, sid: number): string {
+  toJsonWithToken(sid: number): string {
     const token = jwt.sign(
       {
-        id,
-        email,
+        id: this.id,
         at: moment().format("YYYYMMDDHHmmss"),
         sid: sid,
       },

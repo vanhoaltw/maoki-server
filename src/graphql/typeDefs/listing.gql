@@ -1,0 +1,52 @@
+type Listing {
+  id: Int!
+  userId: Int
+  name: String
+  title: String
+  price: Int
+  bedroom: Int
+  bedCount: Int
+  bathroom: Int
+  description: String
+  latitude: Int
+  longitude: Int
+  city: String
+  isActive: Boolean
+  user: User
+  isMine: Boolean
+}
+
+type ListingPagination {
+  results: [Listing]
+  total: Int
+  page: Int
+  pageSize: Int
+}
+
+input CreateListingInput {
+  userId: Int
+  name: String
+  title: String
+  price: Int
+  bedroom: Int
+  bedCount: Int
+  bathroom: Int
+  description: String
+  latitude: Int
+  longitude: Int
+  city: String
+  isActive: Boolean
+
+  explorePicture: [Int]
+}
+
+extend type Query {
+  getListing(filter: JSON, page: Int, pageSize: Int): ListingPagination
+  getListingById(id: Int!): Listing
+}
+
+extend type Mutation {
+  createListing(input: CreateListingInput!): Listing
+  updateListing(input: CreateListingInput, id: Int!): Listing
+  favoriteListing(action: FavoriteAction, id: Int!): Boolean
+}

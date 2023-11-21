@@ -1,5 +1,5 @@
 import { AuthorRepository } from "@/types/repositories";
-import database from "../database";
+import database from "../configs/database";
 import { Author } from "@/types";
 
 export default class AuthorKnexRepository implements AuthorRepository {

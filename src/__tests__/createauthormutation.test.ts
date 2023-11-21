@@ -3,7 +3,7 @@ import express from 'express';
 import { createHandler } from 'graphql-http/lib/use/express';
 import context from '../context';
 import schema from '../schema';
-import database from '../database';
+import database from '../configs/database';
 
 afterAll(() => {
   return database.destroy();

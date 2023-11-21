@@ -1,0 +1,14 @@
+overwrite: true
+schema: "src/graphql/typeDefs/*.gql"
+documents: null
+generates:
+  ./src/generated/graphql.ts:
+    config:
+      contextType: ../graphql/context.js#MyContext
+      useIndexSignature: true
+    plugins:
+      - "typescript"
+      - "typescript-resolvers"
+  ./fragmentTypes.json:
+    plugins:
+      - fragment-matcher

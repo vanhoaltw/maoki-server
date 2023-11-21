@@ -1,8 +1,8 @@
 {
     "watch": ["src"],
     "ignore": ["src/**/*.test.ts"],
-    "ext": "ts,mjs,js,json,graphql",
+    "ext": "ts,mjs,js,json,graphql,gql",
     "legacyWatch": true,
-    "exec": "node -r tsconfig-paths/register -r ts-node/register ./src/index.ts"
+    "exec": "npm run prestart && node -r tsconfig-paths/register -r ts-node/register ./src/index.ts"
   }
   

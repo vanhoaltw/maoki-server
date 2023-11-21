@@ -1,5 +1,5 @@
 import { Quote } from "@/types";
-import database from "../database";
+import database from "../configs/database";
 import { QuoteRepository } from "@/types/repositories";
 
 export default class QuoteKnexRepository implements QuoteRepository {

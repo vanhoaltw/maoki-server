@@ -2,19 +2,29 @@ import { AuthenticationError } from "apollo-server-express";
 import { Application } from "express";
 import got from "got";
 import moment from "moment";
-import { SocialConnect, User } from "./models";
+import { SocialConnect, User } from "../models";
+
+import { takeRight, uniq } from "lodash";
 import { OAuth2Client } from "google-auth-library";
 
-import env from "@/config";
+import env from "@/configs/config";
+import { IndentifyVerificationType } from "@/generated/graphql";
 
-const googleClient = new OAuth2Client({
-  clientId: env.google.clientId,
-  clientSecret: env.google.clientSecret,
-});
+const googleClient = new OAuth2Client(
+  env.google.clientId,
+  env.google.clientSecret,
+  "postmessage"
+);
 
-const processLogin = (user: User) => {
+const processLogin = async (user: User) => {
   const sid = Number(moment().unix());
-  return User.toJsonWebToken(user.id, user?.email, sid);
+  const activeLogin = takeRight(uniq([...(user.sids || []), sid]), 10); // keep 10 last login
+
+  const finalUser = await user.$query().patchAndFetch({
+    sids: activeLogin,
+  });
+
+  return finalUser.toJsonWithToken(sid);
 };
 
 const oauth = (app: Application) => {
@@ -78,12 +88,14 @@ const oauth = (app: Application) => {
   });
 
   app.post("/auth/google", async (req, res) => {
-    const { token } = req.body || {};
+    const { code } = req.body || {};
     try {
-      if (!token) throw new AuthenticationError("INVALID_TOKEN");
+      if (!code) throw new AuthenticationError("INVALID_TOKEN");
+      const { tokens } = await googleClient.getToken(code);
 
+      const idToken = tokens.id_token;
       const ticket = await googleClient.verifyIdToken({
-        idToken: token,
+        idToken,
         audience: env.google.clientId,
       });
 
@@ -91,7 +103,9 @@ const oauth = (app: Application) => {
 
       const profile = {
         email: payload.email,
-        emailVerified: payload.email_verified,
+        identityVerificationTypes: payload.email_verified
+          ? [IndentifyVerificationType.Email]
+          : [],
         username: `gg_${String(payload.sub).substring(0, 20)}`,
         passwordHash: payload.sub,
         firstName: payload?.given_name,
@@ -123,7 +137,7 @@ const oauth = (app: Application) => {
 
       return res
         .status(200)
-        .json({ success: true, token: processLogin(user), user });
+        .json({ success: true, token: await processLogin(user), user });
     } catch (error) {
       console.log({ error });
       res

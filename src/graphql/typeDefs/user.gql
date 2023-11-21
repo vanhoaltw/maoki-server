@@ -1,0 +1,25 @@
+type User {
+  id: Int!
+  firstName: String
+  lastName: String
+  username: String
+  email: String
+  identityVerificationTypes: [String]
+  birthday: Date
+  passwordHash: String
+  bio: String
+  titleText: String
+  gender: String
+  avatar: String
+  favoriteSong: String
+  work: String
+  school: String
+  location: String
+  managedListingsTotalCount: Int
+  guestType: String
+  isAvailable: Boolean
+  isSuperhost: Boolean
+  completeOnboarding: Boolean
+  lastActivedAt: String
+  registeredAt: Date
+}
